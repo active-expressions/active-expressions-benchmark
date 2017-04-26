@@ -91,7 +91,7 @@ var JSONReporter = function(baseReporterDecorator, config, emitter, logger, help
                 };
 
                 var slidingWindowSize = 30,
-                    allowPercentagedDeviation = 4;;
+                    allowPercentagedDeviation = 4;
 
                 var lastMeasurements = durations.slice(-slidingWindowSize),
                     time = average(lastMeasurements),
