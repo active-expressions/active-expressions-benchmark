@@ -1,4 +1,4 @@
-# babel-plugin-aexpr-source-transformation
+# babel-plugin-aexpr-source-transformation [![Build Status](https://travis-ci.org/active-expressions/babel-plugin-aexpr-source-transformation.svg?branch=master)](https://travis-ci.org/active-expressions/babel-plugin-aexpr-source-transformation)
 3rd implementation strategy of active expressions, via a babel transformation
 
 Live editable at http://astexplorer.net/#/h1zFzvogmm/20

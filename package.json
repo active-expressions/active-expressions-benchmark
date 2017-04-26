@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha  test/main.js",
+    "test": "mocha test/main.js",
     "build": "babel index.js -d dist",
     "build-test": "npm run build && npm test"
   },
