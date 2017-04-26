@@ -1,4 +1,4 @@
-# active-expressions-benchmark
+# active-expressions-benchmark [![Build Status](https://travis-ci.org/active-expressions/active-expressions-benchmark.svg?branch=master)](https://travis-ci.org/active-expressions/active-expressions-benchmark)
 Performs benchmark for all active expression implementations, and pushes the results to the [result repository](https://github.com/active-expressions/active-expressions-benchmark-results).
 
 ### General
