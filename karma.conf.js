@@ -265,7 +265,7 @@ module.exports = function(config) {
                 ]
             },
             Chrome_Travis_CI: {
-                base: 'ChromeCanary',
+                base: 'Chrome',
                 flags: [
                     '--no-sandbox',
                     '--disable-hang-monitor'
