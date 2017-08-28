@@ -58,6 +58,7 @@
     "rollup": "^0.34.8",
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-commonjs": "^3.3.1",
+    "rollup-plugin-import-alias": "^1.0.3",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-watch": "^2.5.0",
     "stack-es2015-modules": "^1.1.0"
