@@ -9,8 +9,8 @@ You can trigger a full build and benchmark run using `npm test`.
 
 Bundles are stores under `bundles` and consumed by the respective testing framework.
 
-To create a particular bundle use `npm run build-{baseline, ticking, rewriting, interpretation}`. Use `npm run build-all` for a full build.
-To develop new benchmarks, run the bundling in watch mode using `npm run watch-{baseline, ticking, rewriting, interpretation}`.
+To create a particular bundle use `npm run build-{baseline, ticking, rewriting, rewriting-new, interpretation}`. Use `npm run build-all` for a full build.
+To develop new benchmarks, run the bundling in watch mode using `npm run watch-{baseline, ticking, rewriting, rewriting-new, interpretation}`.
 
 ### Local Usage
 

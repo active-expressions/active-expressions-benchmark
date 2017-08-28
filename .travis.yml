@@ -30,5 +30,7 @@ before_script:
     - sudo apt-get install google-chrome-stable
     - export CHROME_BIN=google-chrome-stable
 
+    - git subtree pull -P benchmark/temp/rewriting-new/aexpr-transform-new https://github.com/systemjs/plugin-babel.git master
+
 after_success:
     - bash deploy-to-gh-pages.sh

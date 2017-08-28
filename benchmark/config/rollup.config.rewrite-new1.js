@@ -7,7 +7,7 @@ var skippedCodebase = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (num) {
 }).concat(['aexpr-source-transformation-propagation']);
 
 export default {
-    entry: 'benchmark/tests/rewriting.js',
+    entry: 'benchmark/tests/rewriting-new.js',
     dest: 'benchmark/temp/rewriting-new/rewriting-new_babel_in.js',
     external: skippedCodebase,
     plugins: [

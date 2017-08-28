@@ -47,6 +47,20 @@ describe('AExpr Construction', function() {
       }
     });
   });
+
+  describe("No-op", function() {
+
+    perfTest(it, "Ticking", {
+      run() {
+        for(let i = 0; i < numberOfAExprsToCreate; i++) {
+          aexprTicking(function() {});
+        }
+      },
+      teardownRun() {
+        clearDefaultActiveExpressions();
+      }
+    });
+  });
 });
 
 describe("Maintain Aspect Ratio", function() {
