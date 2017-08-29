@@ -48,7 +48,8 @@ describe('AExpr Construction', function() {
 
     perfTest(it, "Rewriting", {
       run() {
-        for(let i = 0; i < numberOfAExprsToCreate; i++) {
+        let i;
+        for(i = 0; i < numberOfAExprsToCreate; i++) {
           aexpr(() => rect.aspectRatio());
         }
       },
@@ -67,7 +68,8 @@ describe('AExpr Construction', function() {
         times(numberOfAExprsToCreate, () => rects.push(createRectangle(20, 10)));
       },
       run() {
-        for(let i = 0; i < numberOfAExprsToCreate; i++) {
+        let i;
+        for(i = 0; i < numberOfAExprsToCreate; i++) {
           let rect = rects[i];
           aexpr(() => rect.aspectRatio());
         }
@@ -92,7 +94,8 @@ describe("Maintain Aspect Ratio", function() {
           aexpr(() => rect.aspectRatio())
               .onChange(ratio => rect.height = rect.width / targetAspectRatio);
           randomWidths = [];
-          for(let i = 0; i < aspectRatioCount; i++) {
+          let i;
+          for(i = 0; i < aspectRatioCount; i++) {
               randomWidths.push(aspectRatioRand.random());
           }
       },
@@ -118,7 +121,8 @@ describe("Rewriting Transformation Impact", function() {
   perfTest(it, "Rewriting", {
     setupRun() {
       items = [];
-      for(let i = 0; i < rewritingImpactArraySize; i++) {
+      let i;
+      for(i = 0; i < rewritingImpactArraySize; i++) {
         items.push(quickSortRand.random());
       }
     },
@@ -132,7 +136,8 @@ describe("Rewriting Transformation Impact", function() {
 describe("Partially Rewritten", function() {
   this.timeout(mochaTimeout);
 
-  for(let i = 0; i <= 10; i++) {
+  let i;
+  for(i = 0; i <= 10; i++) {
     let calculations = [];
     let items;
 
@@ -152,7 +157,8 @@ describe("Partially Rewritten", function() {
         calculations[9] = i > 9 ? rewrittenCalc9 : plainCalc9;
 
         items = [];
-        for(let j = 0; j < 30; j++) { // 50
+        let j;
+        for(j = 0; j < 30; j++) { // 50
           items.push(quickSortRand.random());
         }
       },
