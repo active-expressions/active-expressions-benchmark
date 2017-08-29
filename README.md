@@ -35,3 +35,13 @@ Modify this particular file to decide what files should be benchmarked.
 Travis needs a generated [access token](https://github.com/settings/tokens/new) set as environment variable `GH_TOKEN`.
 
 After a successful benchmark run, the results are automatically pushed to the dedicated [result repository](https://github.com/active-expressions/active-expressions-benchmark-results).
+
+#### Subtree usage
+
+This benchmark suite includes the new rewriting strategy as subtree in order to test it simultaneously with an older version.
+Therefore, we include the following subtrees:
+
+- benchmark/temp/rewriting-new/aexpr-transform-new links to https://github.com/active-expressions/babel-plugin-aexpr-source-transformation.git on branch master
+- benchmark/temp/rewriting-new/aexpr-source-transformation-propagation links to https://github.com/active-expressions/aexpr-source-transformation-propagation.git on branch master
+
+We automatically pull the newest versions of these repositories during a travis build.
