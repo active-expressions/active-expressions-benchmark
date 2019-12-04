@@ -6,5 +6,9 @@ export let maintainAspectRatio = {
 }
 
 export let aexprConstruction = {
-  numAExpr: [isCI ? 1e2 : 1e3]
+  numAExpr: [isCI ? 1e2 : 1e3],
+}
+
+export let rewritingTransformationImpact = {
+  arraySize: [1e4],
 }
