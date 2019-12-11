@@ -24,7 +24,6 @@ async function buildAll() {
         fs.readdir(path.join(srcDir, dir), (err, files) => {
           if (err) return console.error(err);
           files.forEach(fileName => {
-            if (fileName === 'interpretation.js') return; //Workaround to ignore unfinished files
             build(dir, fileName);
           })
         })
@@ -35,7 +34,7 @@ async function buildAll() {
 
 async function build(dir, file) {
   const name = path.join(dir, file);
-  const type = path.basename(file);
+  const type = path.basename(file, '.js');
   const inFile = path.join(srcDir, dir, file);
   const outFile = path.join(destDir, dir, file);
   const tmpFile = path.join(srcDir, dir, `_${file}`);
@@ -47,17 +46,18 @@ async function build(dir, file) {
         plugins: ["babel-plugin-aexpr-source-transformation"],
         presets: ["stage-0"],
       }
-    } else if (type === "interpreation") {
+    } else if (type === "interpretation") {
       babelOpts = {
         plugins: ["babel-plugin-locals"],
         presets: ["stage-0", ["es2015", { modules: false }]],
       }
     }
 
-    const code = transpile(await bundle(inFile), babelOpts);
+    const source = await bundle(inFile, null, ['aexpr-source-transformation-propagation', 'aexpr-interpretation']);
+    const transformedSource = transpile(source, babelOpts);
     
     try {
-      await fs.outputFile(tmpFile, code);
+      await fs.outputFile(tmpFile, transformedSource);
       await bundle(tmpFile, outFile);
     } catch (err) {
       console.error(err);
@@ -74,36 +74,37 @@ function transpile(code, optsOverride) {
   const opts = {
     presets: [],
     plugins: [],
-    babelrc: false,
+    // babelrc: false,
     ast: false,
     compact: false,
     sourceType: "script",
   };
   Object.assign(opts, optsOverride);
-  return babel.transform(code, opts).code;
+
+  const originalLog = console.log;
+  try {
+    console.log = (...msgs) => {};
+    return babel.transform(code, opts).code;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    console.log = originalLog;
+  }
 }
 
-async function bundle(inFile, outFile) {
+async function bundle(inFile, outFile, external) {
   const bundle = await rollup.rollup({
     input: inFile,
     external: [
-      '../common.js', //can not be rollup-ed; depends on require.main
+      '../common.js', //can not be rollup-ed (without modifications); depends on `require.main`
       'is-ci',
-      'aexpr-source-transformation-propagation',
-    ],
+    ].concat(external || []),
     plugins: [
       nodeResolve({
         preferBuiltins: true,
+        mainFields: ['jsnext:main', 'main', 'module'],
       }),
-      commonjs({
-        namedExports: {
-          'aexpr-ticking': [
-            'aexprTicking',
-            'checkTicking',
-            'clearDefaultActiveExpressions',
-          ],
-        }
-      }),
+      commonjs(),
     ],
   });
   
@@ -114,7 +115,7 @@ async function bundle(inFile, outFile) {
     });
   } else {
     const result = await bundle.generate({ format: 'cjs' });
-    return result.output[0].code
+    return result.output[0].code;
   }
 }
 
