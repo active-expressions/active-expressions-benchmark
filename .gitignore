@@ -1,6 +1,7 @@
 .idea
 benchmark/bundles
 results
+**/build/*/
 
 # Logs
 logs
