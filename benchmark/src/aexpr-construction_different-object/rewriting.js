@@ -6,17 +6,17 @@ const bench = common.createBenchmark(main, config);
 import createRectangle from '../__deps/fixture.js';
 import { getArray } from '../__deps/utils.js';
 
-import { aexprTicking, clearDefaultActiveExpressions } from 'aexpr-ticking';
+import { reset } from 'aexpr-source-transformation-propagation';
 
 function main({ numAExpr }) {
   const rects = getArray(numAExpr, () => createRectangle(20, 10));
   
   bench.start();
-  for (let i = 0; i < numAExpr; i++) {
+  for (var i = 0; i < numAExpr; i++) {
     const rect = rects[i];
-    aexprTicking(() => rect.aspectRatio());
+    aexpr(() => rect.aspectRatio());
   }
   bench.end(1);
 
-  clearDefaultActiveExpressions();
+  reset();
 }

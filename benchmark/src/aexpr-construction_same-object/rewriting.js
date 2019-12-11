@@ -5,16 +5,16 @@ const bench = common.createBenchmark(main, config);
 
 import createRectangle from '../__deps/fixture.js';
 
-import { aexprTicking, clearDefaultActiveExpressions } from 'aexpr-ticking';
+import { reset } from 'aexpr-source-transformation-propagation';
 
 function main({ numAExpr }) {
   const rect = createRectangle(20, 10);
   
   bench.start();
-  for (let i = 0; i < numAExpr; i++) {
-    aexprTicking(() => rect.aspectRatio());
+  for (var i = 0; i < numAExpr; i++) {
+    aexpr(() => rect.aspectRatio());
   }
   bench.end(1);
 
-  clearDefaultActiveExpressions();
+  reset();
 }

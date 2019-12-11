@@ -3,15 +3,15 @@ import common from '../common.js';
 import { aexprConstruction as config } from '../configs.js';
 const bench = common.createBenchmark(main, config);
 
-import { aexprTicking, clearDefaultActiveExpressions } from 'aexpr-ticking';
+import { reset } from 'aexpr-source-transformation-propagation';
 
 function main({ numAExpr }) {
 
   bench.start();
-  for (let i = 0; i < numAExpr; i++) {
-    aexprTicking(() => {});
+  for (var i = 0; i < numAExpr; i++) {
+    aexpr(() => {});
   }
   bench.end(1);
 
-  clearDefaultActiveExpressions();
+  reset();
 }

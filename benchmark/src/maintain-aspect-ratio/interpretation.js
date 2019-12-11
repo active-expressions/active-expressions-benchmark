@@ -5,7 +5,7 @@ const bench = common.createBenchmark(main, config);
 
 import rand from 'random-seed';
 import createRectangle from '../__deps/fixture.js';
-import { reset } from 'aexpr-source-transformation-propagation';
+import aexprInterpretation from 'aexpr-interpretation';
 
 
 function main({ numWidthChanges, targetAspectRatio }) {
@@ -18,7 +18,7 @@ function main({ numWidthChanges, targetAspectRatio }) {
     randomWidths[i] = rng.random();
   }
   
-  const exp = aexpr(() => rect.aspectRatio());
+  const exp = aexprInterpretation(() => rect.aspectRatio(), { rect });
   exp.onChange(callback);
   
   bench.start();
@@ -26,6 +26,4 @@ function main({ numWidthChanges, targetAspectRatio }) {
     rect.width = randomWidths[i];
   }
   bench.end(numWidthChanges);
-
-  reset();
 }
