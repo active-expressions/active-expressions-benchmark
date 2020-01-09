@@ -1,40 +1,23 @@
-# active-expressions-benchmark [![Build Status](https://travis-ci.org/active-expressions/active-expressions-benchmark.svg?branch=master)](https://travis-ci.org/active-expressions/active-expressions-benchmark)
-Performs benchmark for all active expression implementations, and pushes the results to the [result repository](https://github.com/active-expressions/active-expressions-benchmark-results).
+# active-expressions-benchmark [![build status badge]][Travis CI]
+Performs benchmarking on all JavaScript implementations of [active expressions]. Results are pushed to the [results repository].
 
-### General
+## General
+Benchmark sources can be found in the [`src/`] directory. Each subdirectory (not beginning with `_` or `.`) represesents one benchmarking category. Every implementation can then have one `.js` script actually implementing the benchmark. Scripts named `baseline.js` measure reference values.
 
-The benchmark suite contains two part: Bundling and Benchmarking.
+## Important files
 
-You can trigger a full build and benchmark run using `npm test`.
+| File | Description |
+| --- | --- |
+| [`./build.js`] | Build the benchmarks located in the folder [`src/`] (Current working directory needs to be [`./`]). Bundled files are placed in the [`build/`] folder. |
+| [`./build/run.js`] | Run the (bundled) benchmarks located in the [`build/`] folder (Current working directory needs to be [`build/`]). Running the file without any arguments prints command line options into the console. |
+| [`./src/configs.js`] | Config options for all benchmarks. These are currently bundled into the built benchmark. |
 
-Bundles are stores under `bundles` and consumed by the respective testing framework.
-
-To create a particular bundle use `npm run build-{baseline, ticking, rewriting, rewriting-new, interpretation}`. Use `npm run build-all` for a full build.
-To develop new benchmarks, run the bundling in watch mode using `npm run watch-{baseline, ticking, rewriting, rewriting-new, interpretation}`.
-
-### Local Usage
-
-You can either run the benchmarks using Karma or by using Mocha directly:
-
-For Karma:
-
-Run `karma start` to work in watch mode, or `karma start --single-run` for one-time measurements.
-
-Karma load all compiled files under `bundles`, so delete some if you want to focus on particular benchmarks.
-
-Results are located under `results/latest.json`.
-
-For Mocha:
-
-Simply navigate your browser to the `benchmark/index.html`.
-
-Modify this particular file to decide what files should be benchmarked.
-
+<!--
 ### For Travis CI
 
 Travis needs a generated [access token](https://github.com/settings/tokens/new) set as environment variable `GH_TOKEN`.
 
-After a successful benchmark run, the results are automatically pushed to the dedicated [result repository](https://github.com/active-expressions/active-expressions-benchmark-results).
+After a successful benchmark run, the results are automatically pushed to the dedicated [results repository].
 
 #### Subtree usage
 
@@ -45,3 +28,18 @@ Therefore, we include the following subtrees:
 - benchmark/temp/rewriting-new/aexpr-source-transformation-propagation links to https://github.com/active-expressions/aexpr-source-transformation-propagation.git on branch master
 
 We automatically pull the newest versions of these repositories during a travis build.
+-->
+
+
+<!-- References -->
+[build status badge]: https://travis-ci.org/active-expressions/active-expressions-benchmark.svg?branch=master
+[Travis CI]: https://travis-ci.org/active-expressions/active-expressions-benchmark
+
+[active expressions]: https://github.com/active-expressions/
+[results repository]: https://github.com/active-expressions/active-expressions-benchmark-results
+
+[`./build.js`]: ./build.js
+[`./build/run.js`]: ./build/run.js
+[`./src/configs.js`]: ./src/configs.js
+[`src/`]: ./src/
+[`build/`]: ./build/
