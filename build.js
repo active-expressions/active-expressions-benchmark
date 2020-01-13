@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const commander = require("commander");
 const nodeResolve = require('rollup-plugin-node-resolve');
 const commonjs = require('rollup-plugin-commonjs');
 const rollup = require('rollup');
