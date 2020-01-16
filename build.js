@@ -77,6 +77,9 @@ async function buildFile(dirName, fileName) {
     } else if (type === "interpretation") {
       await interpretationProcessing(tmpFile, tmpFile);
     }
+    else if (type === "proxies") {
+      await proxiesProcessing(tmpFile, tmpFile);
+    }
 
     const finalSource = await bundle(tmpFile);
     await fs.outputFile(outFile, finalSource);
@@ -105,6 +108,19 @@ async function rewritingProcessing(inFile, outFile) {
     plugins: ["babel-plugin-aexpr-source-transformation"],
     presets: ["stage-0"],
   }
+  
+
+  const source = await bundle(inFile, ['aexpr-source-transformation-propagation']);
+  const transformedSource = transpile(source, babelOpts);
+  return fs.outputFile(outFile, transformedSource);
+}
+
+async function proxiesProcessing(inFile, outFile) {
+  const babelOpts =  {
+    plugins: ["babel-plugin-aexpr-proxies"],
+    presets: ["stage-0"],
+  }
+  
 
   const source = await bundle(inFile, ['aexpr-source-transformation-propagation']);
   const transformedSource = transpile(source, babelOpts);

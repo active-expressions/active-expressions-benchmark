@@ -13,3 +13,12 @@
 [submodule "implementations/babel-plugin-locals"]
 	path = implementations/babel-plugin-locals
 	url = https://github.com/active-expressions/babel-plugin-locals
+[submodule "babel-plugin-active-expression-proxies"]
+	path = babel-plugin-active-expression-proxies
+	url = https://github.com/active-expressions/babel-plugin-active-expression-proxies
+[submodule "implementations/babel-plugin-aexpr-proxies"]
+	path = implementations/babel-plugin-aexpr-proxies
+	url = https://github.com/active-expressions/babel-plugin-active-expression-proxies
+[submodule "implementations/aexpr-proxies"]
+	path = implementations/aexpr-proxies
+	url = https://github.com/active-expressions/aexpr-proxies
