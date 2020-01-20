@@ -1,0 +1,3 @@
+"filename", "configuration", "rate", "time"
+"maintain-aspect-ratio/baseline.js", "targetAspectRatio=2 numWidthChanges=100000", 465.03192444161294, 0.00215039
+"maintain-aspect-ratio/interpretation.js", "targetAspectRatio=2 numWidthChanges=100000", 238.15494694265016, 0.004198947

@@ -35,7 +35,7 @@
     "active-expressions": "latest",
     "aexpr-interpretation": "file:./implementations/aexpr-interpretation",
     "aexpr-source-transformation-propagation": "file:./implementations/aexpr-source-transformation-propagation",
-    "aexpr-source-proxies": "file:./implementations/aexpr-proxies",
+    "active-expression-proxies": "file:./implementations/aexpr-proxies",
     "aexpr-ticking": "file:./implementations/aexpr-ticking",
     "babel-core": "^6.11.4",
     "babel-plugin-aexpr-source-transformation": "file:./implementations/babel-plugin-aexpr-source-transformation",

@@ -1,0 +1,6 @@
+"filename", "configuration", "rate", "time"
+"maintain-aspect-ratio/baseline.js", "targetAspectRatio=2 numWidthChanges=100000", 459.0084774275696, 0.002178609
+"maintain-aspect-ratio/interpretation.js", "targetAspectRatio=2 numWidthChanges=100000", 280.70837319392234, 0.003562416
+"maintain-aspect-ratio/proxies.js", "targetAspectRatio=2 numWidthChanges=100000", 4.338803902663863, 0.230478266
+"maintain-aspect-ratio/rewriting.js", "targetAspectRatio=2 numWidthChanges=100000", 1.290163464368919, 0.775095581
+"maintain-aspect-ratio/ticking.js", "targetAspectRatio=2 numWidthChanges=100000", 72.65855622798627, 0.013763004
