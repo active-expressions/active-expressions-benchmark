@@ -41,14 +41,14 @@ if (!validFormats.includes(format)) {
 }
 
 if (format === 'csv') {
-  console.log('"filename", "configuration", "rate", "time"');
+  console.log('"filename", "configuration", "run", "sample", "rate", "time"');
 }
 
 const runs = cli.optional.runs ? parseInt(cli.optional.runs, 10) : 1;
 
 (function runBenchmark(i) {
   const filename = benchmarks[i];
-  (function runSample(j) {
+  (function run(currentRun) {
     const child = fork(path.resolve(__dirname, filename), cli.optional.set, {
       execPath: cli.optional.node || process.execPath
     });
@@ -74,24 +74,24 @@ const runs = cli.optional.runs ? parseInt(cli.optional.runs, 10) : 1;
       if (format === 'csv') {
         // Escape quotes (") for correct csv formatting
         conf = conf.replace(/"/g, '""');
-        console.log(`"${data.name}", "${conf}", ${data.rate}, ${data.time}`);
+        console.log(`"${data.name}", "${conf}", ${currentRun+1}, ${data.sample}, ${data.rate}, ${data.time}`);
       } else {
         var rate = data.rate.toString().split('.');
         rate[0] = rate[0].replace(/(\d)(?=(?:\d\d\d)+(?!\d))/g, '$1,');
         rate = (rate[1] ? rate.join('.') : rate[0]);
-        console.log(`${data.name} ${conf}: ${rate}`);
+        console.log(`${conf} [${currentRun+1}.${data.sample}] ${rate}`);
       }
     });
 
     child.once('close', (code) => {
       if (code) {
         process.exit(code);
-        j = Infinity;
+        currentRun = Infinity;
       }
 
       // If there are more benchmarks execute the next
-      if (j + 1 < runs) {
-        runSample(j + 1);
+      if (currentRun + 1 < runs) {
+        run(currentRun + 1);
       } else if (i + 1 < benchmarks.length) {
         runBenchmark(i + 1);
       }
