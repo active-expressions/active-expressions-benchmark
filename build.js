@@ -122,7 +122,7 @@ async function proxiesProcessing(inFile, outFile) {
   }
   
 
-  const source = await bundle(inFile, ['aexpr-source-transformation-propagation']);
+  const source = await bundle(inFile, ['aexpr-proxies']);
   const transformedSource = transpile(source, babelOpts);
   return fs.outputFile(outFile, transformedSource);
 }
