@@ -37,9 +37,13 @@ class Benchmark {
     // this._run will use fork() to create a new process for each configuration
     // combination.
     if (process.env.hasOwnProperty('NODE_RUN_BENCHMARK_FN')) {
-      process.nextTick(() => fn(this.config));
+      let runner = fn;
+      if (typeof fn === 'function') {
+        runner = { run: fn }
+      }
+      process.nextTick(() => this._run(runner));
     } else {
-      process.nextTick(() => this._run());
+      process.nextTick(() => this._runAllConfigs());
     }
   }
 
@@ -110,15 +114,15 @@ class Benchmark {
     return queue;
   };
 
-  sample(fn, times = 100, numOperations = 1) {
+  _run(runner, times = 100) {
+    if (runner.setup) runner.setup(this.config);
     for (let i = 0; i < times; i++) {
-      this.start();
-      fn();
-      this.end(numOperations);
+      runner.run(this.config);
     }
+    if (runner.teardown) runner.teardown(this.config);
   }
 
-  _run() {
+  _runAllConfigs() {
     const self = this;
 
     (function recursive(queueIndex) {
