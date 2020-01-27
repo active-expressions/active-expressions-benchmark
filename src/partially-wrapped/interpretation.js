@@ -1,7 +1,6 @@
 'use strict';
 import common from '../common.js';
 import { partiallyWrapped as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
 
 import createRectangle from '../__deps/fixture.js';
 
@@ -26,5 +25,7 @@ function main({ totalRects, monitoredRects, repetitions }) {
     }
   }
 
-  bench.end(1);
+  bench.end();
 }
+
+const bench = common.createBenchmark(main, config);

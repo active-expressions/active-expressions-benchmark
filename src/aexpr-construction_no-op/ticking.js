@@ -1,7 +1,6 @@
 'use strict';
 import common from '../common.js';
 import { aexprConstruction as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
 
 import { aexprTicking, clearDefaultActiveExpressions } from 'aexpr-ticking';
 
@@ -11,7 +10,9 @@ function main({ numAExpr }) {
   for (let i = 0; i < numAExpr; i++) {
     aexprTicking(() => {});
   }
-  bench.end(1);
+  bench.end();
 
   clearDefaultActiveExpressions();
 }
+
+const bench = common.createBenchmark(main, config);

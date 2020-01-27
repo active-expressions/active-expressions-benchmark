@@ -1,7 +1,6 @@
 'use strict';
 import common from '../common.js';
 import { maintainAspectRatio as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
 
 import createRectangle from '../__deps/fixture.js';
 import { getRandomArray } from '../__deps/utils.js';
@@ -20,7 +19,9 @@ function main({ numWidthChanges, targetAspectRatio }) {
     rect.width = widths[i];
     checkTicking([ae]);
   }
-  bench.end(1);
+  bench.end();
 
   clearDefaultActiveExpressions();
 }
+
+const bench = common.createBenchmark(main, config);

@@ -1,7 +1,6 @@
 'use strict';
 import common from '../common.js';
 import { aexprConstruction as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
 
 import createRectangle from '../__deps/fixture.js';
 
@@ -14,5 +13,7 @@ function main({ numAExpr }) {
   for (let i = 0; i < numAExpr; i++) {
     aexprInterpretation(() => rect.aspectRatio(), { rect });
   }
-  bench.end(1);
+  bench.end();
 }
+
+const bench = common.createBenchmark(main, config);

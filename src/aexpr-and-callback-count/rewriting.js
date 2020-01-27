@@ -1,7 +1,6 @@
 'use strict';
 import common from '../common.js';
 import { aexprAndCallbackCount as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
 
 import rand from 'random-seed';
 import { getRandomArray } from '../__deps/utils.js';
@@ -23,7 +22,9 @@ function main({ numAExpr, callbacksPerAExpr, arraySize }) {
   
   bench.start();
   quickSort(items);
-  bench.end(1);
+  bench.end();
 
   reset();
 }
+
+const bench = common.createBenchmark(main, config);
