@@ -3,10 +3,10 @@ export default function createRectangle(width = 10, height = 20) {
     width,
     height,
     area() {
-        return this.width * this.height;
+      return this.width * this.height;
     },
     aspectRatio() {
-        return this.width / this.height;
-    }
-  }
+      return this.width / this.height;
+    },
+  };
 }

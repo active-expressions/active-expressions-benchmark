@@ -8,8 +8,8 @@ Benchmark sources can be found in the [`src/`] directory. Each subdirectory (not
 
 | File | Description |
 | --- | --- |
-| [`./build.js`] | Build the benchmarks located in the folder [`src/`] (Current working directory needs to be [`./`]). Bundled files are placed in the [`build/`] folder. |
-| [`./build/run.js`] | Run the (bundled) benchmarks located in the [`build/`] folder (Current working directory needs to be [`build/`]). Running the file without any arguments prints command line options into the console. |
+| [`./build.js`] | Build the benchmarks located in the folder [`src/`]. Bundled files are placed in the [`build/`] folder. |
+| [`./build/run.js`] | Run the (bundled) benchmarks located in the [`build/`] folder. Running the file without any arguments prints command line options into the console. |
 | [`./src/configs.js`] | Config options for all benchmarks. These are currently bundled into the built benchmark. |
 
 <!--

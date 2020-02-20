@@ -7,14 +7,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const babel = require('babel-core');
 
-const srcDir = './src';
-const destDir = './build';
-
-// const program = new commander.Command();
-
-// program
-//   .option()
-
+const srcDir = path.join(__dirname, './src');
+const destDir = path.join(__dirname, './build');
 
 function main() {
   buildAll();
@@ -95,7 +89,9 @@ async function interpretationProcessing(inFile, outFile) {
     presets: ["stage-0", ["es2015", { modules: false }]],
   }
 
-  const source = await bundle(inFile, ['aexpr-interpretation']);
+  const source = await bundle(inFile, [
+    'aexpr-interpretation',
+  ]);
   const transformedSource = transpile(source, babelOpts);
   return fs.outputFile(outFile, transformedSource);
 }
@@ -106,7 +102,9 @@ async function rewritingProcessing(inFile, outFile) {
     presets: ["stage-0"],
   }
 
-  const source = await bundle(inFile, ['aexpr-source-transformation-propagation']);
+  const source = await bundle(inFile, [
+    'aexpr-source-transformation-propagation',
+  ]);
   const transformedSource = transpile(source, babelOpts);
   return fs.outputFile(outFile, transformedSource);
 }
