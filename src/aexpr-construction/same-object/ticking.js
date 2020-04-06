@@ -1,9 +1,7 @@
 'use strict';
-import common from '../common.js';
-import { aexprConstruction as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
+import BenchmarkRunner from '../../../deps/benchmark-runner.js';
 
-import createRectangle from '../__deps/fixture.js';
+import createRectangle from '../../../deps/fixture.js';
 
 import { aexprTicking, clearDefaultActiveExpressions } from 'aexpr-ticking';
 
@@ -14,7 +12,9 @@ function main({ numAExpr }) {
   for (let i = 0; i < numAExpr; i++) {
     aexprTicking(() => rect.aspectRatio());
   }
-  bench.end(1);
+  bench.stop();
 
   clearDefaultActiveExpressions();
 }
+
+const bench = new BenchmarkRunner(main);

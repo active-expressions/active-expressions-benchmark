@@ -1,16 +1,20 @@
 'use strict';
-import common from '../common.js';
-import { rewritingTransformationImpact as config } from '../configs.js';
+import BenchmarkRunner from '../../deps/benchmark-runner.js';
 
-import quickSort from '../__deps/quicksort.js';
-import { getRandomArray } from '../__deps/utils.js';
+import quickSort from '../../deps/quicksort.js';
+import { getRandomArray } from '../../deps/utils.js';
 
 function main({ arraySize }) {
   const items = getRandomArray(arraySize, 'quickSort');
 
   bench.start();
   quickSort(items);
-  bench.end(1);
+  bench.stop();
+
+  items.reduce((previous, current) => {
+    bench.assert(previous <= current);
+    return current;
+  })
 }
 
-const bench = common.createBenchmark(main, config);
+const bench = new BenchmarkRunner(main);

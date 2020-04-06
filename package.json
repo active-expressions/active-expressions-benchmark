@@ -1,8 +1,7 @@
 {
   "name": "active-expressions-benchmark",
   "version": "1.0.0",
-  "description": "Benchmarking the 3 implementation strategies of active-expressions",
-  "main": "index.js",
+  "description": "Benchmarking the implementation strategies of active-expressions",
   "scripts": {
     "test": "npm run build-all && karma start --single-run",
     "build-all": "npm run build-baseline && npm run build-ticking && npm run build-rewriting && npm run build-rewriting-new && npm run build-interpretation",
@@ -32,7 +31,6 @@
   },
   "homepage": "https://github.com/active-expressions/active-expressions-benchmark#readme",
   "dependencies": {
-    "active-expressions": "latest",
     "aexpr-interpretation": "file:./implementations/aexpr-interpretation",
     "aexpr-source-transformation-propagation": "file:./implementations/aexpr-source-transformation-propagation",
     "aexpr-ticking": "file:./implementations/aexpr-ticking",
@@ -46,6 +44,7 @@
     "random-seed": "^0.3.0",
     "rollup": "^1.27.8",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0"
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "yargs": "^15.1.0"
   }
 }

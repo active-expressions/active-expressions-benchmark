@@ -1,8 +1,7 @@
 'use strict';
-import common from '../common.js';
-import { partiallyWrapped as config } from '../configs.js';
+import BenchmarkRunner from '../../deps/benchmark-runner.js';
 
-import createRectangle from '../__deps/fixture.js';
+import createRectangle from '../../deps/fixture.js';
 
 import aexprInterpretation from 'aexpr-interpretation';
 
@@ -16,7 +15,6 @@ function main({ totalRects, monitoredRects, repetitions }) {
   })
 
   bench.start();
-  
   for (let x = 0; x < repetitions; x++) {
     for (let i = 0; i < totalRects; i++) {
       const rect = rects[i];
@@ -24,8 +22,7 @@ function main({ totalRects, monitoredRects, repetitions }) {
       rect.width += rect.height;
     }
   }
-
-  bench.end();
+  bench.stop();
 }
 
-const bench = common.createBenchmark(main, config);
+const bench = new BenchmarkRunner(main);

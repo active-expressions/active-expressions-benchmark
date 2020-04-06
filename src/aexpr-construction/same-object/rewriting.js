@@ -1,9 +1,7 @@
 'use strict';
-import common from '../common.js';
-import { aexprConstruction as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
+import BenchmarkRunner from '../../../deps/benchmark-runner.js';
 
-import createRectangle from '../__deps/fixture.js';
+import createRectangle from '../../../deps/fixture.js';
 
 import { reset } from 'aexpr-source-transformation-propagation';
 
@@ -14,7 +12,9 @@ function main({ numAExpr }) {
   for (var i = 0; i < numAExpr; i++) {
     aexpr(() => rect.aspectRatio());
   }
-  bench.end(1);
+  bench.stop();
 
   reset();
 }
+
+const bench = new BenchmarkRunner(main);

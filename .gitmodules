@@ -1,15 +1,15 @@
-[submodule "implementations/aexpr-source-transformation-propagation"]
+[submodule "aexpr-source-transformation-propagation"]
 	path = implementations/aexpr-source-transformation-propagation
 	url = https://github.com/active-expressions/aexpr-source-transformation-propagation
-[submodule "implementations/babel-plugin-aexpr-source-transformation"]
+[submodule "babel-plugin-aexpr-source-transformation"]
 	path = implementations/babel-plugin-aexpr-source-transformation
 	url = https://github.com/active-expressions/babel-plugin-aexpr-source-transformation
-[submodule "implementations/aexpr-ticking"]
+[submodule "aexpr-ticking"]
 	path = implementations/aexpr-ticking
 	url = https://github.com/active-expressions/aexpr-ticking
-[submodule "implementations/aexpr-interpretation"]
-	path = implementations/aexpr-interpretation
-	url = https://github.com/active-expressions/aexpr-interpretation
-[submodule "implementations/babel-plugin-locals"]
+[submodule "babel-plugin-locals"]
 	path = implementations/babel-plugin-locals
 	url = https://github.com/active-expressions/babel-plugin-locals
+[submodule "aexpr-interpretation"]
+	path = implementations/aexpr-interpretation
+	url = https://github.com/active-expressions/aexpr-interpretation

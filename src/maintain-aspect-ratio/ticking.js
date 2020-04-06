@@ -1,27 +1,26 @@
 'use strict';
-import common from '../common.js';
-import { maintainAspectRatio as config } from '../configs.js';
+import BenchmarkRunner from '../../deps/benchmark-runner.js';
 
-import createRectangle from '../__deps/fixture.js';
-import { getRandomArray } from '../__deps/utils.js';
+import createRectangle from '../../deps/fixture.js';
 
 import { aexprTicking, checkTicking, clearDefaultActiveExpressions } from 'aexpr-ticking';
 
 function main({ numWidthChanges, targetAspectRatio }) {
-  const widths = getRandomArray(numWidthChanges, 'aspectRatio');
   const rect = createRectangle(20, 10);
   
   const ae = aexprTicking(() => rect.aspectRatio());
   ae.onChange(() => rect.height = rect.width / targetAspectRatio);
   
   bench.start();
-  for (let i = 0; i < numWidthChanges; i++) {
-    rect.width = widths[i];
+  for (let i = 1; i <= numWidthChanges; i++) {
+    rect.width = i;
     checkTicking([ae]);
   }
-  bench.end();
+  bench.stop();
+
+  bench.assert(rect.aspectRatio() === targetAspectRatio);
 
   clearDefaultActiveExpressions();
 }
 
-const bench = common.createBenchmark(main, config);
+const bench = new BenchmarkRunner(main);
