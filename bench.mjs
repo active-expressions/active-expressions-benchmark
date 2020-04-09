@@ -10,6 +10,10 @@ import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
 import rollupPluginCommonJS from 'rollup-plugin-commonjs';
 import builtins from 'builtin-modules';
 import babel from 'babel-core';
+import terminalLink from 'terminal-link';
+import logSymbols from 'log-symbols';
+import chalk from 'chalk';
+import cliProgress from 'cli-progress';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = pathLib.dirname(__filename);
@@ -124,6 +128,7 @@ yargs
     "unknown-options-as-args": true, //otherwise negative filters are parsed as options
   })
   .help()
+  .version(false)
   .argv
 
 function parseFilters(filters) {
@@ -155,28 +160,33 @@ function isTagName(tag) {
 }
   
 async function collectAvailableBenchmarks(directory) {
+  const benchmarks = [];
   try {
-    const benchmarks = [];
     const files = await fs.readdir(directory, { withFileTypes: true });
     for (const file of files) {
       const filePath = pathLib.join(directory, file.name);
       if (file.isDirectory()) {
         if (!isTagName(file.name)) continue;
         const children = await collectAvailableBenchmarks(filePath);
-        for (const [path, tags] of children) {
-          benchmarks.push([path, [file.name, ...tags]]);
+        for (const { path, tags } of children) {
+          benchmarks.push({
+            path: path,
+            tags: [file.name, ...tags],
+          });
         }
       } else {
         const basename = pathLib.basename(file.name, '.js');
         if (!isTagName(basename)) continue;
-        benchmarks.push([filePath, [basename]]);
+        benchmarks.push({
+          path: filePath,
+          tags: [basename],
+        });
       }
     }
-    return benchmarks;
   } catch (err) {
-    console.error("Error collecting available benchmarks", err);
+    throw new Error(`Error collecting available benchmarks: ${err.message}`);
   }
-  return {};
+  return benchmarks;
 }
 
 async function collectFilteredBenchmarks(directory, filters) {
@@ -185,14 +195,14 @@ async function collectFilteredBenchmarks(directory, filters) {
 }
 
 function filterBenchmarks(benchmarks, filters) {
-  const notExcludedBenchmarks = benchmarks.filter(([path, tags]) => {
+  const notExcludedBenchmarks = benchmarks.filter(({ path, tags }) => {
     return !filters.negative.some(filterTags => {
       return filterTags.every(filterTag => tags.includes(filterTag));
     })
   })
 
   if (!filters.positive.length) return notExcludedBenchmarks;
-  return notExcludedBenchmarks.filter(([path, tags]) => {
+  return notExcludedBenchmarks.filter(({ path, tags }) => {
     return filters.positive.some(filterTags => {
       return filterTags.every(filterTag => tags.includes(filterTag));
     });
@@ -204,8 +214,6 @@ function noLogDuring(fn) {
   try {
     console.log = (...msgs) => {};
     return fn(originalLog);
-  } catch (err) {
-    console.error(err);
   } finally {
     console.log = originalLog;
   }
@@ -216,12 +224,15 @@ function dateToFolderName(date) {
     return n.toString().padStart(2, '0');
   }
 
-  const YYYY = date.getUTCFullYear();
-  const MM = pad(date.getUTCMonth() + 1);
-  const DD = pad(date.getUTCDate());
-  const hh = pad(date.getUTCHours());
-  const mm = pad(date.getUTCMinutes());
-  const ss = pad(date.getUTCSeconds());
+  // even after searching for quite a while i was unable to find a better solution :/
+  localDate = new Date(date.getTime() + 60000 * date.getTimezoneOffset());
+
+  const YYYY = localDate.getUTCFullYear();
+  const MM = pad(localDate.getUTCMonth() + 1);
+  const DD = pad(localDate.getUTCDate());
+  const hh = pad(localDate.getUTCHours());
+  const mm = pad(localDate.getUTCMinutes());
+  const ss = pad(localDate.getUTCSeconds());
   return `${YYYY}-${MM}-${DD}_${hh}-${mm}-${ss}`;
 }
 
@@ -275,7 +286,7 @@ async function run({
   }
 
   (async function runBenchmark(benchmarkIndex) {
-    const [path, tags] = benchmarks[benchmarkIndex];
+    const { path, tags } = benchmarks[benchmarkIndex];
     const benchmarkName = tags.join('.');
     const childDir = pathLib.dirname(path);
     const config = getConfig(tags);
@@ -294,6 +305,7 @@ async function run({
       const executionResults = [];
       const benchmarkResult = {
         failed: false,
+        error: null,
         parameters: parameters,
         executions: executionResults,
       };
@@ -380,9 +392,11 @@ async function run({
 async function build({source, destination, filters}) {
   const benchmarks = await collectFilteredBenchmarks(source, filters);
 
-  benchmarks.forEach(benchmark => buildBenchmark(benchmark));
+  benchmarks.forEach(benchmark => {
+    buildBenchmark(benchmark);
+  });
 
-  async function buildBenchmark([path, tags]) {
+  async function buildBenchmark({ path, tags }) {
     const name = tags.join('.');
     const relativePath = pathLib.relative(source, path);
 
@@ -407,10 +421,9 @@ async function build({source, destination, filters}) {
 
       await secondBundle(tmpFile, outFile);
 
-      console.log(`Successfully compiled ${name}`);
+      console.log(`${terminalLink(logSymbols.success, `file://${inFile}`)} ${terminalLink(name, `file://${inFile}`)}`);
     } catch (err) {
-      console.log(`Failed to compile ${name}`);
-      console.error(err);
+      console.log(`${terminalLink(logSymbols.error, `file://${outFile}`)} ${terminalLink(name, `file://${inFile}`)} (${chalk.red(err.message)})`);
     } finally {
       await fs.remove(tmpFile);
     }
@@ -489,7 +502,9 @@ function view(argv) {
 
 async function list({path, filters}) {
   const benchmarks = await collectFilteredBenchmarks(path, filters);
-  benchmarks.forEach(([path, tags]) => {
-    console.log(tags.join('.'));
+  benchmarks.forEach(({ path, tags }) => {
+    const name = tags.join('.');
+    const url = `file://${path}`;
+    console.log(terminalLink(name, url));
   })
 }
