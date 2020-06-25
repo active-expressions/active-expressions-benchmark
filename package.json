@@ -33,9 +33,11 @@
   "dependencies": {
     "aexpr-interpretation": "file:./implementations/aexpr-interpretation",
     "aexpr-source-transformation-propagation": "file:./implementations/aexpr-source-transformation-propagation",
+    "active-expression-proxies": "file:./implementations/aexpr-proxies",
     "aexpr-ticking": "file:./implementations/aexpr-ticking",
     "babel-core": "^6.11.4",
     "babel-plugin-aexpr-source-transformation": "file:./implementations/babel-plugin-aexpr-source-transformation",
+    "babel-plugin-aexpr-proxies": "file:./implementations/babel-plugin-aexpr-proxies",
     "babel-plugin-locals": "file:./implementations/babel-plugin-locals",
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-stage-0": "^6.5.0",
