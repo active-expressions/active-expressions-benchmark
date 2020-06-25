@@ -1,16 +1,61 @@
 # active-expressions-benchmark [![build status badge]][Travis CI]
 Performs benchmarking on all JavaScript implementations of [active expressions]. Results are pushed to the [results repository].
 
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/active-expressions/active-expressions-benchmark.git
+# Change into cloned directory
+cd active-expressions-benchmark
+# Initialize submodules
+git submodule update --init --recursive
+# Install node dependencies
+npm install
+# Build benchmarks
+./bench build
+# Run benchmarks
+./bench run
+# For more usage help
+./bench --help
+```
+
+### Using git submodules
+
+```bash
+# Fetch & merge submodule changes from remote (detaches head if there are changes)
+git submodule update --remote --merge
+
+# After each pull of the main project, submodules may need to be updated
+git submodule update --init --recursive
+# The updating after each pull is easily forgotten, hence:
+# Recommended: Use `--recurse-submodules` flag for commands that support it
+git config submodule.recurse true
+# Pushing in the main project will try to push all submodules
+git config push.recurseSubmodules on-demand
+
+# By default submodules are in a detached HEAD state
+# Either manually checkout a branch in the submodule folder
+git checkout master
+# Or from the main project, do so for every submodule
+git submodule foreach 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'
+
+# Include submodule info in `git status`
+git config status.submodulesummary true
+# Include submodule info in `git diff`
+git config diff.submodule log
+```
+
 ## General
-Benchmark sources can be found in the [`src/`] directory. Each subdirectory (not beginning with `_` or `.`) represesents one benchmarking category. Every implementation can then have one `.js` script actually implementing the benchmark. Scripts named `baseline.js` measure reference values.
+
+Benchmark sources can be found in the [`src/`] directory. Each `*.js` file in the directory tree whose sub-path does not contain any item (filename or directory) beginning with `_`, `-` or containing `.` is interpreted as a benchmark.
 
 ## Important files
 
 | File | Description |
 | --- | --- |
-| [`./build.js`] | Build the benchmarks located in the folder [`src/`]. Bundled files are placed in the [`build/`] folder. |
-| [`./build/run.js`] | Run the (bundled) benchmarks located in the [`build/`] folder. Running the file without any arguments prints command line options into the console. |
-| [`./src/configs.js`] | Config options for all benchmarks. These are currently bundled into the built benchmark. |
+| [`./bench`] | Script to interact with benchmarks (build, run, list, etc.). Actual implementation can be found in [`./bench.js`]. |
+| [`./configs.js`] | Config options for all benchmarks. |
 
 <!--
 ### For Travis CI
