@@ -6,7 +6,9 @@ import createRectangle from '../../deps/fixture.js';
 import aexprInterpretation from 'aexpr-interpretation';
 
 function main({ totalRects, monitoredRects, repetitions }) {
-  const rects = Array.from({length: totalRects}, () => createRectangle(20, 10));
+  const rects = Array.from({ length: totalRects }, () => {
+    return createRectangle(20, 10)
+  });
 
   rects.forEach((rect, i) => {
     if (i < monitoredRects) {

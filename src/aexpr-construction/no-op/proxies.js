@@ -1,7 +1,5 @@
 'use strict';
-import common from '../common.js';
-import { aexprConstruction as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
+import BenchmarkRunner from '../../../deps/benchmark-runner.js';
 
 // import { reset } from 'active-expression-proxies';
 
@@ -10,7 +8,9 @@ function main({ numAExpr }) {
   for (var i = 0; i < numAExpr; i++) {
     aexpr(() => {});
   }
-  bench.end(1);
+  bench.stop();
 
   // reset();
 }
+
+const bench = new BenchmarkRunner(main);

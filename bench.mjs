@@ -460,6 +460,11 @@ async function build({source, destination, filters, verbose}) {
           plugins: ["babel-plugin-locals"],
           presets: ["stage-0", ["es2015", { modules: false }]],
         });
+      } else if (tags.includes("proxies")) {
+        await applyBabelPlugin(tmpFile, {
+          plugins: ["babel-plugin-aexpr-proxies"],
+          presets: ["stage-0"],
+        });
       }
 
       await secondBundle(tmpFile, outFile);

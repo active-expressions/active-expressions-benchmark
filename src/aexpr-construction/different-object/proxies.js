@@ -1,10 +1,8 @@
 'use strict';
-import common from '../common.js';
-import { aexprConstruction as config } from '../configs.js';
-const bench = common.createBenchmark(main, config);
+import BenchmarkRunner from '../../../deps/benchmark-runner.js';
 
-import createRectangle from '../__deps/fixture.js';
-import { getArray } from '../__deps/utils.js';
+import createRectangle from '../../../deps/fixture.js';
+import { getArray } from '../../../deps/utils.js';
 
 // import { reset } from 'active-expression-proxies';
 
@@ -16,7 +14,9 @@ function main({ numAExpr }) {
     const rect = rects[i];
     aexpr(() => rect.aspectRatio());
   }
-  bench.end(1);
+  bench.stop();
 
   // reset();
 }
+
+const bench = new BenchmarkRunner(main);

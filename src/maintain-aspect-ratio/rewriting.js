@@ -8,7 +8,6 @@ import { reset } from 'aexpr-source-transformation-propagation';
 function main({ numWidthChanges, targetAspectRatio }) {
   const rect = createRectangle(20, 10);
   
-  
   const ae = aexpr(() => rect.aspectRatio());
   ae.onChange(() => rect.height = rect.width / targetAspectRatio);
   
