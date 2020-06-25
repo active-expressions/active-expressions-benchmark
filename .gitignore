@@ -3,6 +3,8 @@ benchmark/bundles
 results
 **/build/*/
 
+package-lock.json
+
 # Logs
 logs
 *.log
