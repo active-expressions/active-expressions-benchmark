@@ -26,6 +26,14 @@ const configsPath = pathLib.join(__dirname, './configs.mjs');
 
 yargs
   .scriptName('bench')
+  .usage('$0 <command> [<args>]')
+  .options({
+    'v': {
+      alias: 'verbose',
+      describe: 'verbosity level (0 = default, 1 = error output, 2 = logging)',
+      type: 'count',
+    }
+  })
   .command('run [filters..]', 'Execute the benchmarks', yargs => {
     yargs
       .positional('filters', {
@@ -106,9 +114,9 @@ yargs
   .command('cleanup', 'Remove created artifacts', yargs => {
     
   }, cleanup)
-  .command('view', 'Start serving a viewer of benchmark results', yargs => {
+  // .command('view', 'Start serving a viewer of benchmark results', yargs => {
 
-  }, view)
+  // }, view)
   .command(['list [filters..]', 'ls'], 'List available benchmarks', yargs => {
     yargs
       .positional('filters', {
@@ -127,6 +135,8 @@ yargs
   .parserConfiguration({
     "unknown-options-as-args": true, //otherwise negative filters are parsed as options
   })
+  .demandCommand(1, "")
+  .strictCommands()
   .help()
   .version(false)
   .argv
@@ -159,54 +169,56 @@ function isTagName(tag) {
           && !tag.startsWith('-');
 }
   
-async function collectAvailableBenchmarks(directory) {
-  const benchmarks = [];
-  try {
-    const files = await fs.readdir(directory, { withFileTypes: true });
-    for (const file of files) {
-      const filePath = pathLib.join(directory, file.name);
-      if (file.isDirectory()) {
-        if (!isTagName(file.name)) continue;
-        const children = await collectAvailableBenchmarks(filePath);
-        for (const { path, tags } of children) {
-          benchmarks.push({
-            path: path,
-            tags: [file.name, ...tags],
-          });
-        }
-      } else {
-        const basename = pathLib.basename(file.name, '.js');
-        if (!isTagName(basename)) continue;
-        benchmarks.push({
-          path: filePath,
-          tags: [basename],
-        });
-      }
-    }
-  } catch (err) {
-    throw new Error(`Error collecting available benchmarks: ${err.message}`);
-  }
-  return benchmarks;
-}
-
-async function collectFilteredBenchmarks(directory, filters) {
+async function collectFilteredBenchmarks(directory, filters, verbose) {
   const benchmarks = await collectAvailableBenchmarks(directory);
   return filterBenchmarks(benchmarks, filters);
-}
 
-function filterBenchmarks(benchmarks, filters) {
-  const notExcludedBenchmarks = benchmarks.filter(({ path, tags }) => {
-    return !filters.negative.some(filterTags => {
-      return filterTags.every(filterTag => tags.includes(filterTag));
+  async function collectAvailableBenchmarks(directory) {
+    const benchmarks = [];
+    try {
+      const files = await fs.readdir(directory, { withFileTypes: true });
+      for (const file of files) {
+        const filePath = pathLib.join(directory, file.name);
+        if (file.isDirectory()) {
+          if (!isTagName(file.name)) continue;
+          const children = await collectAvailableBenchmarks(filePath);
+          for (const { path, tags } of children) {
+            benchmarks.push({
+              path: path,
+              tags: [file.name, ...tags],
+            });
+          }
+        } else {
+          const basename = pathLib.basename(file.name, '.js');
+          if (!isTagName(basename)) continue;
+          benchmarks.push({
+            path: filePath,
+            tags: [basename],
+          });
+        }
+      }
+    } catch (err) {
+      console.log(`Could not collect available benchmarks: ${chalk.red(err.message)}`);
+      if (verbose) console.error(err);
+      process.exit(1);
+    }
+    return benchmarks;
+  }
+
+  function filterBenchmarks(benchmarks, filters) {
+    const notExcludedBenchmarks = benchmarks.filter(({ path, tags }) => {
+      return !filters.negative.some(filterTags => {
+        return filterTags.every(filterTag => tags.includes(filterTag));
+      })
     })
-  })
-
-  if (!filters.positive.length) return notExcludedBenchmarks;
-  return notExcludedBenchmarks.filter(({ path, tags }) => {
-    return filters.positive.some(filterTags => {
-      return filterTags.every(filterTag => tags.includes(filterTag));
-    });
-  })
+    
+    if (!filters.positive.length) return notExcludedBenchmarks;
+    return notExcludedBenchmarks.filter(({ path, tags }) => {
+      return filters.positive.some(filterTags => {
+        return filterTags.every(filterTag => tags.includes(filterTag));
+      });
+    })
+  }
 }
 
 function noLogDuring(fn) {
@@ -225,7 +237,7 @@ function dateToFolderName(date) {
   }
 
   // even after searching for quite a while i was unable to find a better solution :/
-  localDate = new Date(date.getTime() + 60000 * date.getTimezoneOffset());
+  const localDate = new Date(date.getTime() - 60000 * date.getTimezoneOffset());
 
   const YYYY = localDate.getUTCFullYear();
   const MM = pad(localDate.getUTCMonth() + 1);
@@ -240,6 +252,7 @@ async function run({
                 filters,
                 executions,
                 iterations,
+                verbose,
                 node,
                 configs: configsPath,
                 format,
@@ -247,9 +260,9 @@ async function run({
                 results: resultsDirectory,
                 build: buildFirst,
               }) {
-  if (buildFirst) await build({source: srcDir, destination: benchmarksDirectory, filters: filters});
+  if (buildFirst) await build({source: srcDir, destination: benchmarksDirectory, filters, verbose});
 
-  const benchmarks = await collectFilteredBenchmarks(benchmarksDirectory, filters);
+  const benchmarks = await collectFilteredBenchmarks(benchmarksDirectory, filters, verbose);
   const { default: configs } = await import(configsPath);
   
   const benchmarkResultsDir = pathLib.join(resultsDirectory, dateToFolderName(new Date()));
@@ -260,6 +273,24 @@ async function run({
     await fs.emptyDir(benchmarkResultsDir);
   }
 
+  const progressBars = new cliProgress.MultiBar({
+    format: '{kind}: [{bar}] {value}/{total}',
+    barsize: 60,
+    stopOnComplete: true,
+    clearOnComplete: true,
+  });
+  const runProgress = progressBars.create(benchmarks.length, 0, { name: '' });
+  runProgress.options = Object.assign({}, runProgress.options, {
+    format: 'Elapsed: {duration_formatted} | Benchmark {value}/{total}: {name}',
+  });
+  const variationProgress = progressBars.create(getTotalNumVariations(), 0, {kind: 'V'});
+
+  function getTotalNumVariations() {
+    return benchmarks.reduce((n, benchmark) => {
+      return n + getNumVariations(getConfig(benchmark.tags));
+    }, 0)
+  }
+  
   function getNumVariations(config) {
     let size = 1;
     for (const values of Object.values(config)) {
@@ -298,6 +329,10 @@ async function run({
       config: config,
       variations: [],
     };
+
+    runProgress.update(benchmarkIndex+1, {
+      name: benchmarkName,
+    });
     
     (function runConfigVariation(variationIndex) {
       const parameters = getVariation(config, variationIndex);
@@ -310,6 +345,8 @@ async function run({
         executions: executionResults,
       };
       benchmarkResults.variations.push(benchmarkResult);
+      variationProgress.increment();
+      const executionProgress = progressBars.create(executions, 0, {kind: 'E'});
       
       (function runExecution(execution) {
         const iterationResults = [];
@@ -319,6 +356,8 @@ async function run({
           iterations: iterationResults,
         };
         executionResults.push(executionResult);
+        executionProgress.update(execution);
+        const iterationProgress = progressBars.create(iterations, 0, {kind: 'I'});
         
         const child = fork(path, childArgs, {
           cwd: childDir,
@@ -328,6 +367,7 @@ async function run({
 
         child.on('message', data => {
           if (data.type === 'iteration') {
+            iterationProgress.update(data.iteration);
             iterationResults.push({
               iteration: data.iteration,
               startDate: data.startDate,
@@ -343,12 +383,13 @@ async function run({
             benchmarkResult.failed = true;
             endConfigVariation();
           } else {
-            console.log(`${benchmarkName} : ${execution}/${executions}`);
+            //TODO
             endExecution();
           }
         })
 
         function endExecution() {
+          progressBars.remove(iterationProgress);
           if (execution < executions) {
             runExecution(execution + 1);
           } else {
@@ -359,6 +400,7 @@ async function run({
       })(1)
 
       function endConfigVariation() {
+        progressBars.remove(executionProgress);
         if (variationIndex + 1 < numParameterVariations) {
           runConfigVariation(variationIndex + 1);
         } else {
@@ -385,12 +427,13 @@ async function run({
   })(0)
 
   function endRun() {
-    console.log("Finished run");
+    progressBars.stop();
   }
 }
 
-async function build({source, destination, filters}) {
-  const benchmarks = await collectFilteredBenchmarks(source, filters);
+async function build({source, destination, filters, verbose}) {
+  if (verbose >= 2) console.log('== build ==');
+  const benchmarks = await collectFilteredBenchmarks(source, filters, verbose);
 
   benchmarks.forEach(benchmark => {
     buildBenchmark(benchmark);
@@ -421,9 +464,10 @@ async function build({source, destination, filters}) {
 
       await secondBundle(tmpFile, outFile);
 
-      console.log(`${terminalLink(logSymbols.success, `file://${inFile}`)} ${terminalLink(name, `file://${inFile}`)}`);
+      console.log(`${terminalLink(logSymbols.success, `file://${outFile}`)} ${terminalLink(name, `file://${inFile}`)}`);
     } catch (err) {
-      console.log(`${terminalLink(logSymbols.error, `file://${outFile}`)} ${terminalLink(name, `file://${inFile}`)} (${chalk.red(err.message)})`);
+      console.log(`${logSymbols.error} ${terminalLink(name, `file://${inFile}`)} (${chalk.red(err.message)})`);
+      if (verbose) console.error(err);
     } finally {
       await fs.remove(tmpFile);
     }
@@ -497,11 +541,11 @@ async function cleanup(argv) {
 }
 
 function view(argv) {
-  console.log("view");
+
 }
 
-async function list({path, filters}) {
-  const benchmarks = await collectFilteredBenchmarks(path, filters);
+async function list({path, filters, verbose}) {
+  const benchmarks = await collectFilteredBenchmarks(path, filters, verbose);
   benchmarks.forEach(({ path, tags }) => {
     const name = tags.join('.');
     const url = `file://${path}`;
