@@ -105,13 +105,9 @@ export let handler = async function ({
   const variationProgress = progressBars.create(getTotalNumVariations(), 0, {kind: 'V'});
   
   try {
-    runBenchmarks();
+    await runBenchmarks();
   } finally {
     progressBars.stop();
-  }
-  
-  function runBenchmarks() {
-    runBenchmark(0);
   }
   
   function getTotalNumVariations() {
@@ -145,125 +141,113 @@ export let handler = async function ({
     return key ? configs[key] : {};
   }
 
-  function runBenchmark(benchmarkIndex) {
-    const { path, tags } = benchmarks[benchmarkIndex];
-    const benchmarkName = tags.join('.');
-    const childDir = pathLib.dirname(path);
-    const config = getConfig(tags);
-    const numParameterVariations = getNumVariations(config);
-    const benchmarkResults = {
-      file: path,
-      name: benchmarkName,
-      tags: tags,
-      config: config,
-      variations: [],
-    };
-
-    runProgress.update(benchmarkIndex+1, {
-      name: benchmarkName,
-    });
-    
-    (function runConfigVariation(variationIndex) {
-      const parameters = getVariation(config, variationIndex);
-      const childArgs = [iterations, JSON.stringify(parameters)];
-      const executionResults = [];
-      const benchmarkResult = {
-        failed: false,
-        error: null,
-        parameters: parameters,
-        executions: executionResults,
+  async function runBenchmarks() {
+    for (let benchmarkIndex = 0; benchmarkIndex < benchmarks.length; benchmarkIndex++) {
+      const { path, tags } = benchmarks[benchmarkIndex];
+      const benchmarkName = tags.join('.');
+      const childDir = pathLib.dirname(path);
+      const config = getConfig(tags);
+      const numParameterVariations = getNumVariations(config);
+      const benchmarkResults = {
+        file: path,
+        name: benchmarkName,
+        tags: tags,
+        config: config,
+        variations: [],
       };
-      benchmarkResults.variations.push(benchmarkResult);
-      variationProgress.increment();
-      const executionProgress = progressBars.create(executions, 0, {kind: 'E'});
+
+      runProgress.update(benchmarkIndex+1, {
+        name: benchmarkName,
+      });
       
-      (function runExecution(execution) {
-        const iterationResults = [];
-        const executionResult = {
-          execution: execution,
-          startDate: new Date(),
-          iterations: iterationResults,
+      for (let variationIndex = 0; variationIndex < numParameterVariations; variationIndex++) {
+        const parameters = getVariation(config, variationIndex);
+        const childArgs = [iterations, JSON.stringify(parameters)];
+        const executionResults = [];
+        const benchmarkResult = {
+          failed: false,
+          error: null,
+          parameters: parameters,
+          executions: executionResults,
         };
-        executionResults.push(executionResult);
-        executionProgress.increment();
-        const iterationProgress = progressBars.create(iterations, 1, {kind: 'I'});
+        benchmarkResults.variations.push(benchmarkResult);
+        variationProgress.increment();
+        const executionProgress = progressBars.create(executions, 0, {kind: 'E'});
         
-        const child = fork(path, childArgs, {
-          cwd: childDir,
-          execPath: node,
-          execArgv: [],
-        });
+        for (let execution = 1; execution <= executions; execution++) {
+          const iterationResults = [];
+          const executionResult = {
+            execution: execution,
+            startDate: new Date(),
+            iterations: iterationResults,
+          };
+          executionResults.push(executionResult);
+          executionProgress.increment();
+          const iterationProgress = progressBars.create(iterations, 1, {kind: 'I'});
+          
+          const executionPromise = new Promise((resolve, reject) => {
+            const child = fork(path, childArgs, {
+              cwd: childDir,
+              execPath: node,
+              execArgv: [],
+            });
 
-        child.on('message', data => {
-          if (data.type === 'iteration') {
-            iterationProgress.increment();
-            iterationResults.push({
-              iteration: data.iteration,
-              startDate: data.startDate,
-              elapsed: data.elapsed,
-            })
-          } else if (data.type === 'error') {
-            benchmarkResult.error = data.error;
-          }
-        });
+            child.on('message', data => {
+              if (data.type === 'iteration') {
+                iterationProgress.increment();
+                iterationResults.push({
+                  iteration: data.iteration,
+                  startDate: data.startDate,
+                  elapsed: data.elapsed,
+                })
+              } else if (data.type === 'error') {
+                benchmarkResult.error = data.error;
+              }
+            });
+    
+            child.on('error', reject);
+            child.on('exit', code => {
+              if (code !== 0) {
+                reject();
+              } else {
+                resolve();
+              }
+            });
+          });
 
-        child.once('close', code => {
-          if (code !== 0) {
+          try {
+            await executionPromise;
+          } catch {
             benchmarkResult.failed = true;
-            endConfigVariation();
-          } else {
-            endExecution();
           }
-        })
 
-        function endExecution() {
           progressBars.remove(iterationProgress);
-          if (execution < executions) {
-            runExecution(execution + 1);
-          } else {
-            endConfigVariation();
-          }
         }
-      })(1)
-
-      function endConfigVariation() {
         progressBars.remove(executionProgress);
-        if (variationIndex + 1 < numParameterVariations) {
-          runConfigVariation(variationIndex + 1);
-        } else {
-          endBenchmark();
-        }
       }
 
-    })(0)
-
-    async function endBenchmark() {
       const benchmarkResultsFile = pathLib.join(benchmarkResultsDir, benchmarkName + '.json');
       await fs.outputJSON(benchmarkResultsFile, benchmarkResults, {
         spaces: '\t',
         EOL: '\n',
       });
-
-      if (benchmarkIndex + 1 < benchmarks.length) {
-        runBenchmark(benchmarkIndex + 1);
-      }
     }
   }
-}
 
-function dateToFolderName(date) {
-  function pad(n) {
-    return n.toString().padStart(2, '0');
+  function dateToFolderName(date) {
+    function pad(n) {
+      return n.toString().padStart(2, '0');
+    }
+  
+    // even after searching for quite a while i was unable to find a better solution :/
+    const localDate = new Date(date.getTime() - 60000 * date.getTimezoneOffset());
+  
+    const YYYY = localDate.getUTCFullYear();
+    const MM = pad(localDate.getUTCMonth() + 1);
+    const DD = pad(localDate.getUTCDate());
+    const hh = pad(localDate.getUTCHours());
+    const mm = pad(localDate.getUTCMinutes());
+    const ss = pad(localDate.getUTCSeconds());
+    return `${YYYY}-${MM}-${DD}_${hh}-${mm}-${ss}`;
   }
-
-  // even after searching for quite a while i was unable to find a better solution :/
-  const localDate = new Date(date.getTime() - 60000 * date.getTimezoneOffset());
-
-  const YYYY = localDate.getUTCFullYear();
-  const MM = pad(localDate.getUTCMonth() + 1);
-  const DD = pad(localDate.getUTCDate());
-  const hh = pad(localDate.getUTCHours());
-  const mm = pad(localDate.getUTCMinutes());
-  const ss = pad(localDate.getUTCSeconds());
-  return `${YYYY}-${MM}-${DD}_${hh}-${mm}-${ss}`;
 }
