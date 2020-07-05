@@ -110,37 +110,6 @@ export let handler = async function ({
     progressBars.stop();
   }
   
-  function getTotalNumVariations() {
-    return benchmarks.reduce((n, benchmark) => {
-      return n + getNumVariations(getConfig(benchmark.tags));
-    }, 0)
-  }
-  
-  function getNumVariations(config) {
-    let size = 1;
-    for (const values of Object.values(config)) {
-      if (!Array.isArray(values) || !values.length) continue;
-      size *= values.length;
-    }
-    return size;
-  }
-  
-  function getVariation(config, i) {
-    let cycle = 1;
-    let result = {};
-    for (const [property, values] of Object.entries(config)) {
-      if (!Array.isArray(values) || !values.length) continue;
-      result[property] = values[Math.trunc(i/cycle) % values.length];
-      cycle *= values.length;
-    }
-    return result;
-  }
-
-  function getConfig(tags) {
-    const key = Object.keys(configs).find(filter => tags.includes(filter));
-    return key ? configs[key] : {};
-  }
-
   async function runBenchmarks() {
     for (let benchmarkIndex = 0; benchmarkIndex < benchmarks.length; benchmarkIndex++) {
       const { path, tags } = benchmarks[benchmarkIndex];
@@ -233,6 +202,38 @@ export let handler = async function ({
       });
     }
   }
+  
+  function getTotalNumVariations() {
+    return benchmarks.reduce((n, benchmark) => {
+      return n + getNumVariations(getConfig(benchmark.tags));
+    }, 0)
+  }
+  
+  function getNumVariations(config) {
+    let size = 1;
+    for (const values of Object.values(config)) {
+      if (!Array.isArray(values) || !values.length) continue;
+      size *= values.length;
+    }
+    return size;
+  }
+  
+  function getVariation(config, i) {
+    let cycle = 1;
+    let result = {};
+    for (const [property, values] of Object.entries(config)) {
+      if (!Array.isArray(values) || !values.length) continue;
+      result[property] = values[Math.trunc(i/cycle) % values.length];
+      cycle *= values.length;
+    }
+    return result;
+  }
+
+  function getConfig(tags) {
+    const key = Object.keys(configs).find(filter => tags.includes(filter));
+    return key ? configs[key] : {};
+  }
+
 
   function dateToFolderName(date) {
     function pad(n) {
