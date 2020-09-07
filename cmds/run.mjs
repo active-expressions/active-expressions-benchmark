@@ -5,9 +5,7 @@ import cliProgress from 'cli-progress';
 
 import { parseFilters, collectFilteredBenchmarks } from './shared/filters.mjs'
 
-const buildDir = pathLib.resolve('./build');
-const resultsDir = pathLib.resolve('./results');
-const configsPath = pathLib.resolve('./configs.mjs');;
+import { buildDir, resultsDir, configsPath } from './shared/constants.mjs';
 
 export let command = 'run [filters..]';
 

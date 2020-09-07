@@ -10,10 +10,7 @@ import builtins from 'builtin-modules';
 import babel from 'babel-core';
 
 import { parseFilters, collectFilteredBenchmarks } from './shared/filters.mjs'
-
-const srcDir = pathLib.resolve('./src');
-const buildDir = pathLib.resolve('./build');
-const depsDir = pathLib.resolve('./deps');
+import { srcDir, buildDir, babelOptionsPath, excludeFromBundlePath } from './shared/constants.mjs';
 
 export let command = 'build [filters..]';
 
@@ -46,6 +43,12 @@ export let handler = async function ({source, destination, filters, verbose}) {
   
   const benchmarks = await collectFilteredBenchmarks(source, filters);
   if (verbose >= 2) console.log('benchmarks collected');
+
+  const { default: babelOptions } = await import(babelOptionsPath);
+  if (verbose >= 2) console.log('babel options imported');
+
+  const { default: excludeFromBundle } = await import(excludeFromBundlePath);
+  if (verbose >= 2) console.log('exclusions from bundle imported');
   
   benchmarks.forEach(benchmark => {
     buildBenchmark(benchmark);
@@ -64,21 +67,9 @@ export let handler = async function ({source, destination, filters, verbose}) {
       if (verbose >= 2) console.log(`first bundle: ${relativePath}`);
       await firstBundle(inFile, tmpFile);
 
-      if (tags.includes("rewriting")) {
-        await applyBabelPlugin(tmpFile, {
-          plugins: ["babel-plugin-aexpr-source-transformation"],
-          presets: ["stage-0"],
-        });
-      } else if (tags.includes("interpretation")) {
-        await applyBabelPlugin(tmpFile, {
-          plugins: ["babel-plugin-locals"],
-          presets: ["stage-0", ["es2015", { modules: false }]],
-        });
-      } else if (tags.includes("proxies")) {
-        await applyBabelPlugin(tmpFile, {
-          plugins: ["babel-plugin-aexpr-proxies"],
-          presets: ["stage-0"],
-        });
+      const babelOpts = getBabelOptions(tags);
+      if (babelOpts) {
+        await applyBabelPlugin(tmpFile, babelOpts);
       }
 
       if (verbose >= 2) console.log(`second bundle: ${relativePath}`);
@@ -91,6 +82,13 @@ export let handler = async function ({source, destination, filters, verbose}) {
     } finally {
       await fs.remove(tmpFile);
     }
+  }
+
+  function getBabelOptions(tags) {
+    for (const [filter, options] of Object.entries(babelOptions)) {
+      if (tags.includes(filter)) return options;
+    }
+    return null;
   }
 
   async function applyBabelPlugin(file, babelOpts) {
@@ -125,16 +123,7 @@ export let handler = async function ({source, destination, filters, verbose}) {
   async function firstBundle(inFile, outFile) {
     const options = {
       input: inFile,
-      external: [
-        'yargs',
-        'is-ci',
-        'random-seed',
-        'aexpr-ticking',
-        'aexpr-source-transformation-propagation',
-        'aexpr-interpretation',
-        pathLib.resolve(depsDir, './benchmark-runner.js'),
-        pathLib.resolve(depsDir, './utils.js'),
-      ],
+      external: excludeFromBundle,
     };
     const bundle = await rollup.rollup(options);
     

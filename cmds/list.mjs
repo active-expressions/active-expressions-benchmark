@@ -1,9 +1,7 @@
-import pathLib from 'path';
 import terminalLink from 'terminal-link';
 
 import { parseFilters, collectFilteredBenchmarks } from './shared/filters.mjs'
-
-const srcDir = pathLib.resolve('./src');
+import { srcDir } from './shared/constants.mjs';
 
 export let command = 'list [filters..]';
 

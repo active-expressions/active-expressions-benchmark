@@ -1,9 +1,6 @@
 import fs from 'fs-extra';
-import pathLib from 'path';
-import { fileURLToPath } from 'url';
 
-const buildDir = pathLib.resolve('./build');
-const resultsDir = pathLib.resolve('./results');
+import { buildDir, resultsDir } from './shared/constants.mjs';
 
 export let command = 'cleanup';
 
