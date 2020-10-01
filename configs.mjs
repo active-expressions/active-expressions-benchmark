@@ -4,7 +4,7 @@ export default {
   "maintain-aspect-ratio": {
     numWidthChanges: isCI
                       ? [1e4]
-                      : [1e5],
+                      : [1e6],
     targetAspectRatio: [2],
   },
   "aexpr-construction": {
