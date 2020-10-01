@@ -1,21 +1,8 @@
 {
   "name": "active-expressions-benchmark",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Benchmarking the implementation strategies of active-expressions",
   "scripts": {
-    "test": "npm run build-all && karma start --single-run",
-    "build-all": "npm run build-baseline && npm run build-ticking && npm run build-rewriting && npm run build-rewriting-new && npm run build-interpretation",
-    "build-all-except-baseline": "npm run build-ticking && npm run build-rewriting && npm run build-interpretation",
-    "build-baseline": "rollup -c benchmark/config/rollup.config.baseline.js",
-    "build-ticking": "rollup -c benchmark/config/rollup.config.ticking.js",
-    "build-rewriting": "rollup -c benchmark/config/rollup.config.rewrite1.js && cd benchmark/temp/rewriting && babel rewriting_babel_in.js --out-file rewriting_babel_out.js && cd ../../.. && rollup -c benchmark/config/rollup.config.rewrite2.js",
-    "build-rewriting-new": "rollup -c benchmark/config/rollup.config.rewrite-new1.js && cd benchmark/temp/rewriting-new && cd aexpr-transform-new && babel index.js  -d dist && cd .. && babel rewriting-new_babel_in.js --out-file rewriting-new_babel_out.js && cd ../../.. && rollup -c benchmark/config/rollup.config.rewrite-new2.js",
-    "build-interpretation": "rollup -c benchmark/config/rollup.config.interpretation.js && cd benchmark/temp/interpretation && babel interpretation_babel_in.js --out-file interpretation_babel_out.js && cd ../../.. && rollup -c benchmark/config/rollup.config.interpretation2.js",
-    "watch-baseline": "chokidar benchmark/tests/baseline* -c \"npm run build-baseline\"",
-    "watch-ticking": "chokidar benchmark/tests/ticking* -c \"npm run build-ticking\"",
-    "watch-rewriting": "chokidar benchmark/tests/rewriting* -c \"npm run build-rewriting\"",
-    "watch-interpretation": "chokidar benchmark/tests/interpretation* -c \"npm run build-interpretation\"",
-    "multiple-benchs": "for /l %x in (1, 1, 100) do (karma start --single-run && cd results && copy latest.json latest%x.json && cd ..)"
   },
   "repository": {
     "type": "git",
@@ -46,7 +33,6 @@
     "fs-extra": "^8.1.0",
     "is-ci": "^2.0.0",
     "log-symbols": "^3.0.0",
-    "ora": "^4.0.3",
     "random-seed": "^0.3.0",
     "rollup": "^1.32.1",
     "rollup-plugin-commonjs": "^10.1.0",
