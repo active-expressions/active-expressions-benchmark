@@ -169,6 +169,7 @@ export let handler = async function ({
                 })
               } else if (data.type === 'error') {
                 benchmarkResult.error = data.error;
+                reject();
               }
             });
     
