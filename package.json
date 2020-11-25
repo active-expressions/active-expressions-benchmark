@@ -2,7 +2,9 @@
   "name": "active-expressions-benchmark",
   "version": "2.0.0",
   "description": "Benchmarking the implementation strategies of active-expressions",
-  "scripts": {},
+  "scripts": {
+    "install-subrepos": "for d in ./implementations/*/ ; do (cd \"$d\" && npm install); done"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/active-expressions/active-expressions-benchmark.git"
