@@ -9,14 +9,15 @@ subrepos[implementations/aexpr-interpretation]=https://github.com/active-express
 subrepos[implementations/babel-plugin-aexpr-proxies]=https://github.com/active-expressions/babel-plugin-active-expression-proxies
 subrepos[implementations/aexpr-proxies]=https://github.com/active-expressions/aexpr-proxies
 
-for FOLDER in "${!subrepos[@]}"
-do
-  REMOTE_URL="${subrepos[$FOLDER]}"
-  echo "############ SETUP $REMOTE_URL IN FOLDER $FOLDER"
-  git clone $REMOTE_URL $FOLDER
-  cd $FOLDER
-  npm install
-  cc ../..
-done
+echo $PWD
+#for FOLDER in "${!subrepos[@]}"
+#do
+#  REMOTE_URL="${subrepos[$FOLDER]}"
+#  echo "############ SETUP $REMOTE_URL IN FOLDER $FOLDER"
+#  git clone $REMOTE_URL $FOLDER
+#  cd $FOLDER
+#  npm install
+#  cc ../..
+#done
 
 echo "Implementation Repos installed"
