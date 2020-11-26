@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "Benchmarking the implementation strategies of active-expressions",
   "scripts": {
-    "install-subrepos": "for d in ./implementations/*/ ; do (cd \"$d\" && npm install); done"
+    "postinstall": "chmod +x ./postinstall.sh && ./postinstall.sh"
   },
   "repository": {
     "type": "git",

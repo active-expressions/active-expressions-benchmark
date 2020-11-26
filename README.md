@@ -8,10 +8,13 @@ Performs benchmarking on all JavaScript implementations of [active expressions].
 git clone https://github.com/active-expressions/active-expressions-benchmark.git
 # Change into cloned directory
 cd active-expressions-benchmark
-# Initialize submodules
-git submodule update --init --recursive
-# Install node dependencies
+# Install node dependencies & Initialize submodules
 npm install
+```
+
+## Usage
+
+```bash
 # Build benchmarks
 ./bench build
 # Run benchmarks

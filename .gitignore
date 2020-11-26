@@ -2,6 +2,8 @@
 benchmark/bundles
 results
 **/build/*/
+# all folders in implementation
+implementations/*/
 
 package-lock.json
 
