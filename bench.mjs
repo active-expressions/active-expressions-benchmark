@@ -5,8 +5,6 @@ import yargs from 'yargs';
 import * as cmdBuild from './cmds/build.mjs';
 import * as cmdRun from './cmds/run.mjs';
 import * as cmdList from './cmds/list.mjs';
-import * as cmdCleanup from './cmds/cleanup.mjs';
-import * as cmdWatch from './cmds/watch.mjs';
 
 yargs
   .scriptName('bench')
@@ -20,9 +18,7 @@ yargs
   })
   .command(cmdBuild)
   .command(cmdRun)
-  .command(cmdCleanup)
   .command(cmdList)
-  .command(cmdWatch)
   .parserConfiguration({
     "unknown-options-as-args": true, //otherwise negative filters are parsed as options
   })
