@@ -1,8 +1,10 @@
 #!/usr/bin/env sh 
 
 CWD=`pwd`
-DIR=`dirname "$0"`
-cd "${DIR}/implementations"
+REPO=`dirname "$0"`
+cd "${REPO}"
+mkdir -p "implementations"
+cd implementations
 
 # ticking
 git clone https://github.com/active-expressions/aexpr-ticking.git
