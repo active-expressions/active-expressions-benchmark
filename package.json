@@ -24,7 +24,7 @@
     "aexpr-source-transformation-propagation": "file:./implementations/aexpr-source-transformation-propagation",
     "aexpr-ticking": "file:./implementations/aexpr-ticking",
     "babel-core": "^6.11.4",
-    "babel-plugin-aexpr-proxies": "file:./implementations/babel-plugin-aexpr-proxies",
+    "babel-plugin-aexpr-proxies": "file:./implementations/babel-plugin-active-expression-proxies",
     "babel-plugin-aexpr-source-transformation": "file:./implementations/babel-plugin-aexpr-source-transformation",
     "babel-plugin-locals": "file:./implementations/babel-plugin-locals",
     "babel-preset-es2015": "^6.13.2",
