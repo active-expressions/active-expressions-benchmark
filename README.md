@@ -3,47 +3,43 @@ Performs benchmarking on all JavaScript implementations of [active expressions].
 
 ## Installation
 
+### Clone this repository
 ```bash
-# Clone the repository
 git clone https://github.com/active-expressions/active-expressions-benchmark.git
-# Change into cloned directory
 cd active-expressions-benchmark
-# Initialize submodules
-git submodule update --init --recursive
-# Install node dependencies
+```
+
+### Make implementation repositories available
+#### Option 1: Clone implementation repositories
+```bash
+./cloneImplementations.sh
+```
+
+#### Option 2: Link implementations directory
+If you have all implementation repositories checked out in the same parent directory, you can link it as the `implementations` folder.
+```bash
+ln -s path/to/real/folder/ ./implementations
+```
+
+#### Option 3: Link individual implementation repositories
+If you have the implementations checked out in different parent directories, you can link each checkout individually into the `implementations` folder.
+```bash
+ln -s path/to/repo/ ./implementations/repo
+```
+
+### Install the package
+```bash
 npm install
+```
+
+## First Steps
+```bash
 # Build benchmarks
 ./bench build
 # Run benchmarks
 ./bench run
 # For more usage help
 ./bench --help
-```
-
-### Using git submodules
-
-```bash
-# Fetch & merge submodule changes from remote (detaches head if there are changes)
-git submodule update --remote --merge
-
-# After each pull of the main project, submodules may need to be updated
-git submodule update --init --recursive
-# The updating after each pull is easily forgotten, hence:
-# Recommended: Use `--recurse-submodules` flag for commands that support it
-git config submodule.recurse true
-# Pushing in the main project will try to push all submodules
-git config push.recurseSubmodules on-demand
-
-# By default submodules are in a detached HEAD state
-# Either manually checkout a branch in the submodule folder
-git checkout master
-# Or from the main project, do so for every submodule
-git submodule foreach 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)'
-
-# Include submodule info in `git status`
-git config status.submodulesummary true
-# Include submodule info in `git diff`
-git config diff.submodule log
 ```
 
 ## General
