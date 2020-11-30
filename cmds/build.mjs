@@ -1,7 +1,11 @@
 import fs from 'fs-extra';
 import pathLib from 'path';
 import logSymbols from 'log-symbols';
-import terminalLink from 'terminal-link';
+import realTerminalLink from 'terminal-link';
+
+function terminalLink(text, url, options = { fallback: false }) {
+  return realTerminalLink(text, url, options);
+}
 
 import rollup from 'rollup';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
@@ -64,7 +68,6 @@ export let handler = async function ({source, destination, filters, verbose}) {
     const outFile = pathLib.join(destination, relativePath);
 
     try {
-      if (verbose >= 2) console.log(`first bundle: ${relativePath}`);
       await firstBundle(inFile, tmpFile);
 
       const babelOpts = getBabelOptions(tags);
@@ -72,16 +75,18 @@ export let handler = async function ({source, destination, filters, verbose}) {
         await applyBabelPlugin(tmpFile, babelOpts);
       }
 
-      if (verbose >= 2) console.log(`second bundle: ${relativePath}`);
       await secondBundle(tmpFile, outFile);
+
+      await fs.remove(tmpFile);
+      if (verbose >= 2) console.log(`removed tmp file: ${tmpFile}`);
 
       console.log(`${terminalLink(logSymbols.success, `file://${outFile}`)} ${terminalLink(name, `file://${inFile}`)}`);
     } catch (err) {
       console.log(`${logSymbols.error} ${terminalLink(name, `file://${inFile}`)} (${chalk.red(err.message)})`);
       if (verbose) console.error(err);
-    } finally {
-      await fs.remove(tmpFile);
     }
+
+    if (verbose >= 2) console.log(`finished building ${name}`);
   }
 
   function getBabelOptions(tags) {
@@ -121,6 +126,8 @@ export let handler = async function ({source, destination, filters, verbose}) {
   }
 
   async function firstBundle(inFile, outFile) {
+    if (verbose >= 2) console.log(`start first bundle into: ${outFile}`);
+
     const options = {
       input: inFile,
       external: excludeFromBundle,
@@ -134,6 +141,8 @@ export let handler = async function ({source, destination, filters, verbose}) {
   }
 
   async function secondBundle(inFile, outFile) {
+    if (verbose >= 2) console.log(`start second bundle into: ${outFile}`);
+
     const options = {
       input: inFile,
       external: builtins,
@@ -145,11 +154,20 @@ export let handler = async function ({source, destination, filters, verbose}) {
         rollupPluginCommonJS(),
       ]
     };
-    const bundle = await rollup.rollup(options);
+
+    if (verbose >= 2) console.log(`start rollup with options:`);
+    if (verbose >= 2) console.log(options);
+    try {
+      const bundle = await rollup.rollup(options);
+
+      if (verbose >= 2) console.log(`end rollup`);
     
-    return await bundle.write({
-      file: outFile,
-      format: 'cjs'
-    });
+      return await bundle.write({
+        file: outFile,
+        format: 'cjs'
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 }

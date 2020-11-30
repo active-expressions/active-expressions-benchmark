@@ -9,7 +9,7 @@ cd implementations
 # ticking
 git clone https://github.com/active-expressions/aexpr-ticking.git
 # interpretation
-git clone https://github.com/active-expressions/aexpr-interpretation.git
+git clone --recurse-submodules https://github.com/active-expressions/aexpr-interpretation.git
 git clone https://github.com/active-expressions/babel-plugin-locals.git
 # rewriting
 git clone https://github.com/active-expressions/aexpr-source-transformation-propagation.git
