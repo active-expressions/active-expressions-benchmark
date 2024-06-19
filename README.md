@@ -1,4 +1,4 @@
-# active-expressions-benchmark [![build status badge]][Travis CI]
+# active-expressions-benchmark [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12166505.svg)](https://doi.org/10.5281/zenodo.12166505)
 Performs benchmarking on all JavaScript implementations of [active expressions]. Results are pushed to the [results repository].
 
 ## Installation
